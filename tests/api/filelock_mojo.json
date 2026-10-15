@@ -1,0 +1,217 @@
+{
+  "compiler": "1.1.0",
+  "api_version": "0.1",
+  "exports": [
+    "FileLock",
+    "HeldFileLock",
+    "LockError",
+    "LockErrorKind",
+    "LockMode",
+    "ReadWriteLock",
+    "ScopedFileLock",
+    "atomic_write",
+    "locked_read"
+  ],
+  "declarations": {
+    "atomic.atomic_write": [
+      "def atomic_write(path: String, content: String, timeout: Float64 = 5) raises"
+    ],
+    "atomic.locked_read": [
+      "def locked_read( path: String, max_bytes: Int = 1048576, timeout: Float64 = 5 ) raises -> String"
+    ],
+    "locking.FileLock": [
+      "struct FileLock(Movable)"
+    ],
+    "locking.FileLock.__deinit__": [
+      "def __deinit__(deinit self)"
+    ],
+    "locking.FileLock.__enter__": [
+      "def __enter__(mut self) raises"
+    ],
+    "locking.FileLock.__exit__": [
+      "def __exit__(mut self) raises"
+    ],
+    "locking.FileLock.__init__": [
+      "def __init__( out self, path: String, *, timeout: Float64 = -1, poll_interval: Float64 = 0.01, mode: LockMode = .exclusive, ) raises LockError",
+      "def __init__(out self, *, deinit move: Self)"
+    ],
+    "locking.FileLock.acquire": [
+      "def acquire(mut self) raises LockError",
+      "def acquire(mut self, *, timeout: Float64) raises LockError"
+    ],
+    "locking.FileLock.acquire_guard": [
+      "def acquire_guard( mut self, ) raises -> HeldFileLock[origin_of(self)]",
+      "def acquire_guard( mut self, *, timeout: Float64 ) raises -> HeldFileLock[origin_of(self)]"
+    ],
+    "locking.FileLock.hold": [
+      "def hold(mut self) -> ScopedFileLock[origin_of(self)]",
+      "def hold(mut self, *, timeout: Float64) -> ScopedFileLock[origin_of(self)]"
+    ],
+    "locking.FileLock.is_locked": [
+      "def is_locked(self) -> Bool"
+    ],
+    "locking.FileLock.lock_count": [
+      "def lock_count(self) -> Int"
+    ],
+    "locking.FileLock.mode": [
+      "def mode(self) -> LockMode"
+    ],
+    "locking.FileLock.path": [
+      "def path(self) -> String"
+    ],
+    "locking.FileLock.release": [
+      "def release(mut self) raises LockError"
+    ],
+    "locking.FileLock.try_acquire": [
+      "def try_acquire(mut self) raises LockError -> Bool"
+    ],
+    "locking.FileLock.try_hold": [
+      "def try_hold( mut self, ) raises LockError -> Optional[HeldFileLock[origin_of(self)]]"
+    ],
+    "locking.HeldFileLock": [
+      "struct HeldFileLock[origin: MutOrigin](Movable)"
+    ],
+    "locking.HeldFileLock.__deinit__": [
+      "def __deinit__(deinit self)"
+    ],
+    "locking.HeldFileLock.__enter__": [
+      "def __enter__(mut self) raises"
+    ],
+    "locking.HeldFileLock.__exit__": [
+      "def __exit__(mut self) raises"
+    ],
+    "locking.HeldFileLock.__init__": [
+      "def __init__( out self, ref[Self.origin] lock: FileLock, *, timeout: Float64 ) raises LockError"
+    ],
+    "locking.HeldFileLock.is_active": [
+      "def is_active(self) -> Bool"
+    ],
+    "locking.HeldFileLock.release": [
+      "def release(mut self) raises LockError"
+    ],
+    "locking.LockError": [
+      "struct LockError(ImplicitlyCopyable, Writable)"
+    ],
+    "locking.LockError.errno": [
+      "var errno: Int"
+    ],
+    "locking.LockError.kind": [
+      "var kind: LockErrorKind"
+    ],
+    "locking.LockError.write_to": [
+      "def write_to(self, mut writer: Some[Writer])"
+    ],
+    "locking.LockErrorKind": [
+      "struct LockErrorKind(Equatable, ImplicitlyCopyable)"
+    ],
+    "locking.LockErrorKind.forked": [
+      "comptime forked = Self(5)"
+    ],
+    "locking.LockErrorKind.invalid_guard_state": [
+      "comptime invalid_guard_state = Self(9)"
+    ],
+    "locking.LockErrorKind.invalid_mode": [
+      "comptime invalid_mode = Self(7)"
+    ],
+    "locking.LockErrorKind.invalid_path": [
+      "comptime invalid_path = Self(0)"
+    ],
+    "locking.LockErrorKind.invalid_time": [
+      "comptime invalid_time = Self(1)"
+    ],
+    "locking.LockErrorKind.mode_conflict": [
+      "comptime mode_conflict = Self(8)"
+    ],
+    "locking.LockErrorKind.not_held": [
+      "comptime not_held = Self(4)"
+    ],
+    "locking.LockErrorKind.recursion_limit": [
+      "comptime recursion_limit = Self(6)"
+    ],
+    "locking.LockErrorKind.system": [
+      "comptime system = Self(3)"
+    ],
+    "locking.LockErrorKind.timeout": [
+      "comptime timeout = Self(2)"
+    ],
+    "locking.LockMode": [
+      "struct LockMode(Equatable, ImplicitlyCopyable, Writable)"
+    ],
+    "locking.LockMode.exclusive": [
+      "comptime exclusive = Self(_LOCK_EX)"
+    ],
+    "locking.LockMode.shared": [
+      "comptime shared = Self(_LOCK_SH)"
+    ],
+    "locking.LockMode.write_to": [
+      "def write_to(self, mut writer: Some[Writer])"
+    ],
+    "locking.ScopedFileLock": [
+      "struct ScopedFileLock[origin: MutOrigin](Movable)"
+    ],
+    "locking.ScopedFileLock.__deinit__": [
+      "def __deinit__(deinit self)"
+    ],
+    "locking.ScopedFileLock.__enter__": [
+      "def __enter__(mut self) raises"
+    ],
+    "locking.ScopedFileLock.__exit__": [
+      "def __exit__(mut self) raises"
+    ],
+    "locking.ScopedFileLock.__init__": [
+      "def __init__(out self, ref[Self.origin] lock: FileLock, timeout: Float64)"
+    ],
+    "readwrite.ReadWriteLock": [
+      "struct ReadWriteLock(Movable)"
+    ],
+    "readwrite.ReadWriteLock.__init__": [
+      "def __init__( out self, path: String, *, timeout: Float64 = -1, poll_interval: Float64 = 0.01, ) raises LockError"
+    ],
+    "readwrite.ReadWriteLock.acquire_read": [
+      "def acquire_read(mut self) raises LockError",
+      "def acquire_read(mut self, *, timeout: Float64) raises LockError"
+    ],
+    "readwrite.ReadWriteLock.acquire_write": [
+      "def acquire_write(mut self) raises LockError",
+      "def acquire_write(mut self, *, timeout: Float64) raises LockError"
+    ],
+    "readwrite.ReadWriteLock.is_locked": [
+      "def is_locked(self) -> Bool"
+    ],
+    "readwrite.ReadWriteLock.is_read_locked": [
+      "def is_read_locked(self) -> Bool"
+    ],
+    "readwrite.ReadWriteLock.is_write_locked": [
+      "def is_write_locked(self) -> Bool"
+    ],
+    "readwrite.ReadWriteLock.lock_count": [
+      "def lock_count(self) -> Int"
+    ],
+    "readwrite.ReadWriteLock.path": [
+      "def path(self) -> String"
+    ],
+    "readwrite.ReadWriteLock.read": [
+      "def read( mut self, *, timeout: Float64 ) raises -> ScopedFileLock[origin_of(self._lock)]",
+      "def read(mut self) raises -> ScopedFileLock[origin_of(self._lock)]"
+    ],
+    "readwrite.ReadWriteLock.release": [
+      "def release(mut self) raises LockError"
+    ],
+    "readwrite.ReadWriteLock.try_acquire_read": [
+      "def try_acquire_read(mut self) raises LockError -> Bool"
+    ],
+    "readwrite.ReadWriteLock.try_acquire_write": [
+      "def try_acquire_write(mut self) raises LockError -> Bool"
+    ],
+    "readwrite.ReadWriteLock.try_read": [
+      "def try_read( mut self, ) raises LockError -> Optional[HeldFileLock[origin_of(self._lock)]]"
+    ],
+    "readwrite.ReadWriteLock.try_write": [
+      "def try_write( mut self, ) raises LockError -> Optional[HeldFileLock[origin_of(self._lock)]]"
+    ],
+    "readwrite.ReadWriteLock.write": [
+      "def write( mut self, *, timeout: Float64 ) raises -> ScopedFileLock[origin_of(self._lock)]",
+      "def write(mut self) raises -> ScopedFileLock[origin_of(self._lock)]"
+    ]
+  }
+}

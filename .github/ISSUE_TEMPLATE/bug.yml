@@ -1,0 +1,22 @@
+name: Bug report
+description: Report incorrect documented behavior
+title: "[Bug] "
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Package and Mojo version
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Operating system and architecture
+    validations:
+      required: true
+  - type: textarea
+    id: reproducer
+    attributes:
+      label: Minimal reproducer, expected result and actual result
+    validations:
+      required: true

@@ -1,0 +1,8 @@
+.venv/
+.build/
+__pycache__/
+__mojocache__/
+.DS_Store
+.ruff_cache/
+/tests/*.json
+.local/

@@ -1,0 +1,49 @@
+name: Native library checks
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acceptance:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15]
+        compiler: [stable, nightly]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: 0.12.23
+      - run: uv sync --locked
+      - if: matrix.compiler == 'nightly'
+        run: uv pip install --python .venv/bin/python --extra-index-url https://whl.modular.com/nightly/simple/ mojo==1.2.0.dev2026100905
+      - run: .venv/bin/python tools/check_all.py --report ci
+      - run: .venv/bin/python tools/build_packages.py
+      - uses: prefix-dev/setup-pixi@9dabb60412d3d2d967a8d682f7ce01317af40514 # v0.11.0
+        with:
+          pixi-version: v0.81.0
+          run-install: false
+      - if: matrix.compiler == 'stable' && runner.os == 'macOS'
+        run: pixi exec --spec rattler-build=0.76.1 -- .venv/bin/python tools/build_distributions.py
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: acceptance-${{ matrix.os }}-${{ matrix.compiler }}
+          path: |
+            tests/acceptance-ci.json
+            tests/*verification.json
+            .build/packages/manifest.json
+            .build/distributions/**
+            .build/docs/**
+            .build/*.log
+          if-no-files-found: error
+          include-hidden-files: true

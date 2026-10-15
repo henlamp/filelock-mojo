@@ -1,0 +1,9 @@
+[packages.filelock_mojo]
+distribution = "filelock-mojo"
+reference = "filelock"
+license = "MIT"
+license_file = "src/filelock_mojo/LICENSE"
+summary = "Unix process locks with tracked context guards"
+
+[release]
+packages = ["filelock_mojo"]
