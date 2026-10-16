@@ -2,7 +2,7 @@ name: Native library checks
 
 on:
   push:
-    branches: ["**"]
+    branches: [main]
   pull_request:
   workflow_dispatch:
 

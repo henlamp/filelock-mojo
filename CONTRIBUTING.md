@@ -2,6 +2,7 @@
 
 Develop on `development`; merge tested changes into `main` through focused pull
 requests. Publish new versions from `main` and preserve published release files.
+Development pushes do not start Actions; run local checks before requesting CI.
 
 Run `uv sync --locked` and `uv run python tools/check_all.py`.
 Native process workloads live in `tests/*.mojo`; Python checks kernel behavior

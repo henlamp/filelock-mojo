@@ -31,8 +31,9 @@ Do not unlink or replace the lock file, or share an owner across threads.
 Atomic writes preserve the old file if publication fails; they do not promise
 power-loss durability. Windows and cross-host locking are unsupported.
 
-Version 0.1.0 packages use Mojo 1.1.0 on macOS ARM64. Source checks also cover
-1.2.0.dev2026100905; Linux is experimental.
+Published 0.1.0 packages use Mojo 1.1.0 on macOS ARM64. Development 0.2.0 adds
+Linux x86-64 packages and fresh installed-consumer checks. Source checks also
+cover 1.2.0.dev2026100905.
 
 [API](docs/libraries/filelock-mojo.md) · [Compatibility](docs/COMPATIBILITY.md) ·
 [Checks](docs/VALIDATION.md). Run `uv run python tools/check_all.py` to verify the checkout.

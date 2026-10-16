@@ -1,7 +1,7 @@
 # Compatibility
 
 The source API targets FileLock on Mojo 1.1.0, macOS ARM64
-and experimental Linux x86-64. The compiler version is an exact dependency. A `.mojoc`
+and Linux x86-64. The compiler version is an exact dependency. A `.mojoc`
 artifact belongs to the compiler that built it; another compiler needs a rebuild
 and its own acceptance run.
 
