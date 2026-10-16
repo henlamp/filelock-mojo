@@ -7,15 +7,16 @@ in native Mojo. Owners are move-only; guards borrow them.
 
 ## Install
 
-Build from source:
+With [Pixi](https://pixi.sh):
 
 ```sh
-git clone https://github.com/henlamp/filelock-mojo.git
-cd filelock-mojo
-uv sync --locked
+pixi init my-project
+cd my-project
+pixi workspace channel add https://repo.prefix.dev/modular-community https://conda.modular.com/max
+pixi add filelock-mojo
 ```
 
-Save as `example.mojo`, then run `uv run mojo run -I src example.mojo`:
+Save as `example.mojo`, then run `pixi run mojo run example.mojo`:
 
 ```mojo
 from filelock_mojo import atomic_write, locked_read
