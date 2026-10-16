@@ -32,8 +32,10 @@ jobs:
         with:
           pixi-version: v0.81.0
           run-install: false
-      - if: matrix.compiler == 'stable' && runner.os == 'macOS'
+      - if: matrix.compiler == 'stable'
         run: pixi exec --spec rattler-build=0.76.1 -- .venv/bin/python tools/build_distributions.py
+      - if: matrix.compiler == 'stable'
+        run: .venv/bin/python tools/release.py installed --channel "file://$PWD/.build/distributions"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:

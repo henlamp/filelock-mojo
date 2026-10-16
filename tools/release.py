@@ -19,6 +19,15 @@ RECIPE = ROOT / "conda.recipe/recipe.yaml"
 CHANNELS = ["https://conda.modular.com/max", "conda-forge"]
 
 
+def native_subdir():
+    host = (platform.system(), platform.machine().lower())
+    if host == ("Darwin", "arm64"):
+        return "osx-arm64"
+    if host[0] == "Linux" and host[1] in {"x86_64", "amd64"}:
+        return "linux-64"
+    raise ValueError("Supported package hosts are macOS ARM64 and Linux x86-64")
+
+
 def run(command, **kwargs):
     return subprocess.check_output(
         [str(arg) for arg in command], text=True, **kwargs
@@ -54,7 +63,10 @@ def checked_artifact(tag=None):
     name = report["artifact"]
     if Path(name).name != name or not name.endswith(".conda"):
         raise ValueError("Invalid package filename")
-    artifact = OUTPUT / "osx-arm64" / name
+    subdir = report["subdir"]
+    if subdir != native_subdir():
+        raise ValueError("Package platform differs from this host")
+    artifact = OUTPUT / subdir / name
     if (
         artifact.is_symlink()
         or hashlib.sha256(artifact.read_bytes()).hexdigest() != report["sha256"]
@@ -78,7 +90,7 @@ def inspect(artifact, rattler, destination):
     if (metadata["name"], metadata["version"], metadata["subdir"]) != (
         recipe["package"]["name"],
         recipe["package"]["version"],
-        "osx-arm64",
+        native_subdir(),
     ):
         raise ValueError("Unexpected package metadata")
     if (
@@ -105,16 +117,13 @@ def inspect(artifact, rattler, destination):
 
 def build(rattler="rattler-build", tag=None):
     recipe = check_tag(tag) if tag else spec()
-    if platform.system() != "Darwin" or platform.machine() != "arm64":
-        raise ValueError("This release recipe currently requires native macOS ARM64")
+    subdir = native_subdir()
     if run(["git", "status", "--porcelain"], cwd=ROOT):
         raise ValueError("Build requires a clean committed source tree")
     if run([rattler, "--version"]) != "rattler-build 0.76.1":
         raise ValueError("Use rattler-build 0.76.1")
     OUTPUT.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory(
-        prefix="mojo-release-", dir="/private/tmp"
-    ) as directory:
+    with tempfile.TemporaryDirectory(prefix="mojo-release-", dir="/tmp") as directory:
         work = Path(directory)
         source = work / "source"
         source.mkdir()
@@ -148,17 +157,18 @@ def build(rattler="rattler-build", tag=None):
                 "Package build or installed tests failed; see .build/distributions/build.log"
             )
         candidates = list(
-            (work / "output/osx-arm64").glob(recipe["package"]["name"] + "-*.conda")
+            (work / "output" / subdir).glob(recipe["package"]["name"] + "-*.conda")
         )
         if len(candidates) != 1:
             raise ValueError("Expected exactly one package")
         metadata = inspect(candidates[0], rattler, work / "inspected")
-        target = OUTPUT / "osx-arm64" / candidates[0].name
+        target = OUTPUT / subdir / candidates[0].name
         target.parent.mkdir(exist_ok=True)
         shutil.copy2(candidates[0], target)
     report = {
         "name": metadata["name"],
         "version": metadata["version"],
+        "subdir": metadata["subdir"],
         "source_commit": head(),
         "recipe_sha256": hashlib.sha256(RECIPE.read_bytes()).hexdigest(),
         "artifact": target.name,
@@ -169,14 +179,23 @@ def build(rattler="rattler-build", tag=None):
         "depends": metadata["depends"],
     }
     (OUTPUT / "release.json").write_text(json.dumps(report, indent=2) + "\n")
+    record = dict(metadata, sha256=report["sha256"], size=target.stat().st_size)
+    for channel_subdir in (subdir, "noarch"):
+        directory = OUTPUT / channel_subdir
+        directory.mkdir(exist_ok=True)
+        index = {
+            "info": {"subdir": channel_subdir},
+            "packages": {},
+            "packages.conda": {target.name: record} if channel_subdir == subdir else {},
+            "repodata_version": 1,
+        }
+        (directory / "repodata.json").write_text(json.dumps(index) + "\n")
     return target, report
 
 
 def installed(channel, pixi="pixi", tag=None):
     _, report = checked_artifact(tag)
-    with tempfile.TemporaryDirectory(
-        prefix="mojo-consumer-", dir="/private/tmp"
-    ) as directory:
+    with tempfile.TemporaryDirectory(prefix="mojo-consumer-", dir="/tmp") as directory:
         project = Path(directory)
         commands = [
             [pixi, "init", "--format", "pixi", "."],

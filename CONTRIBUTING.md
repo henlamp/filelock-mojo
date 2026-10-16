@@ -1,5 +1,8 @@
 # Contributing
 
+Develop on `development`; merge tested changes into `main` through focused pull
+requests. Publish new versions from `main` and preserve published release files.
+
 Run `uv sync --locked` and `uv run python tools/check_all.py`.
 Native process workloads live in `tests/*.mojo`; Python checks kernel behavior
 and interoperability with Python-filelock.
